@@ -1,6 +1,6 @@
 <h1 align="center">Slicky</h1>
 
-<p align="center"><img src="docs/slicky.png" width="620" alt="Slicky, idle, delighted, and mid-hop"></p>
+<p align="center"><img src="docs/hop.gif" width="450" alt="Slicky hopping across the desktop"></p>
 
 <p align="center">
   <em>A small robot who lives on your desktop, hops around when the mood takes him,<br>
