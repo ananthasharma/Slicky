@@ -246,6 +246,12 @@ If you're sending a PR: keep it in the style of what's already there, and if
 you're touching the drawing, `--preview` renders him offscreen so you can see
 what you did without squinting at a corner of your screen.
 
+Found something security-shaped? Please report it privately —
+[SECURITY.md](SECURITY.md) has the details, and also spells out exactly what
+Slicky can do on your Mac: the one network call he makes, how updates are
+verified, why he watches for mouse drags, and what the optional Accessibility
+permission is used for.
+
 ## Under the hood
 
 ```
