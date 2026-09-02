@@ -119,6 +119,8 @@ Non-apps bounce off. He's picky.
 
 ## Clicking him
 
+<p align="center"><img src="docs/slicky.png" width="560" alt="Idle, delighted, and mid-hop"></p>
+
 A single click has to wait out the system double-click interval before it can be
 certain you weren't about to click twice. Half a second of nothing looks broken,
 so instead: he squashes under your press, then goes wide-eyed and coiled with
