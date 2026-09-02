@@ -1,0 +1,41 @@
+name: Build
+
+# Verification only: this never signs and never publishes. Releases are cut
+# from a Mac with the Developer ID certificate, by hand. See the README.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Toolchain
+        run: swift --version
+
+      - name: Build
+        run: swift build -c release
+
+      - name: Assemble the app bundle
+        # No Developer ID on the runner, so build.sh signs ad-hoc — which is
+        # exactly what anyone building from source gets.
+        run: ./build.sh
+
+      - name: Check the bundle came out intact
+        run: |
+          set -euo pipefail
+          APP=dist/Slicky.app
+          test -x "$APP/Contents/MacOS/Slicky"
+          plutil -lint "$APP/Contents/Info.plist"
+          codesign --verify --strict --verbose=2 "$APP"
+          echo "version: $(plutil -extract CFBundleShortVersionString raw "$APP/Contents/Info.plist")"
