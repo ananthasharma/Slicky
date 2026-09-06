@@ -360,7 +360,22 @@ final class PetController: NSObject, ObservableObject, PetInteractionDelegate {
         let base = max(4, Debug.interval ?? config.interval)
         let extra = config.randomizeInterval
             ? Double.random(in: Self.randomHopRange) : 0
-        nextWander = Date().addingTimeInterval(max(1.2, base + extra))
+        // Every so often he just settles in for a while. Constant motion at a
+        // steady cadence reads as restless; the occasional long sit doesn't.
+        let rest = Double.random(in: 0...1) < 0.25 ? 1.9 : 1.0
+        nextWander = Date().addingTimeInterval(max(1.2, (base + extra) * rest))
+    }
+
+    /// How far he travels is relative to how big he is. 800pt from a Guppy is
+    /// nine of his own body lengths and looks frantic; the same from a Whale is
+    /// a comfortable stride. Normalised against the default size.
+    private var reachScale: Double { config.scale / 0.9 }
+
+    /// Most moves are short. Squaring the roll keeps the long ones rare enough
+    /// to stay interesting when they happen.
+    private func randomReach(of maximum: Double) -> Double {
+        let roll = pow(Double.random(in: 0...1), 1.8)
+        return (0.18 + 0.82 * roll) * maximum * reachScale
     }
 
     /// Sometimes he walks there instead of hopping. Walking is lateral only —
@@ -381,7 +396,7 @@ final class PetController: NSObject, ObservableObject, PetInteractionDelegate {
         guard high - low > 80 else { return false }
 
         for _ in 0..<6 {
-            let reach = Double.random(in: 90...max(140, config.hopDistance * 0.8))
+            let reach = max(70 * reachScale, randomReach(of: config.hopDistance * 0.7))
             let target = min(max(origin.x + (Bool.random() ? reach : -reach), low), high)
             if abs(target - origin.x) > 60 {
                 beginWalk(toX: target)
@@ -440,9 +455,9 @@ final class PetController: NSObject, ObservableObject, PetInteractionDelegate {
         let origin = panel.frame.origin
 
         var target = origin
-        let reach = distance ?? (Double.random(in: 0...1) < 0.18
-                                 ? Double.random(in: 20...60)
-                                 : Double.random(in: 0.3...1.0) * config.hopDistance)
+        let reach = distance ?? (Double.random(in: 0...1) < 0.25
+                                 ? Double.random(in: 20...70) * reachScale
+                                 : randomReach(of: config.hopDistance))
         for _ in 0..<8 {
             let angle = Double.random(in: 0..<(2 * .pi))
             let candidate = CGPoint(x: origin.x + cos(angle) * reach,

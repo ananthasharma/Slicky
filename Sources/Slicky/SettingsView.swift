@@ -251,7 +251,8 @@ struct BehaviourTab: View {
                 MarkedSlider(label: "Hop distance", value: $controller.config.hopDistance,
                              range: 80...900, stops: MarkedSlider.planets,
                              tolerance: 12) { String(format: "%.0fpt", $0) }
-                Text("Named for places he will never visit. He's fine about it.")
+                Text("Named for places he will never visit. Trips scale with his "
+                     + "size, so a Guppy goes a shorter way than a Whale does.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }

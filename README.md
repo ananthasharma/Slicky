@@ -261,6 +261,13 @@ exactly as punctual as the slider says, which is somehow worse.
 **Krikkit**, **Magrathea**. Like the size slider, drag it anywhere you like — the
 names just light up when you land on one. He has been to none of them.
 
+Distance scales with his size, because it has to: eight hundred points from a
+Guppy is nine of his own body lengths and looks frantic, while the same trip
+from a Whale is a comfortable stride. Most moves are short in any case — the
+long ones are deliberately rare, so they still register as an event. And every
+so often he simply sits for a while, because a pet that moves on a metronome
+isn't restful to have around.
+
 ### Walking
 
 <p align="center"><img src="docs/walk.png" width="620" alt="One full walk cycle"></p>

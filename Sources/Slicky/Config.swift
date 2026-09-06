@@ -48,7 +48,7 @@ struct Config: Codable {
     var menuApps: [AppAction] = []
 
     var wander = true
-    var interval: Double = 25
+    var interval: Double = 40
     var hopDistance: Double = 320
     var scale: Double = 0.9
     var aboveEverything = false
