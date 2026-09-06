@@ -252,7 +252,9 @@ tabs so nothing has to scroll:
 Coffee and a *Star him on GitHub* button live in the footer, visible from every
 tab, because burying the tip jar three clicks deep felt like false modesty.
 
-**Hop timing** deserves a note. The slider sets roughly how long he waits, and
+**Hop timing** deserves a note. He waits about a minute and a quarter by
+default, which is the sort of interval you notice without being interrupted by.
+The slider sets roughly how long he waits, and
 *Randomise the wait* adds **±π seconds** to every gap — so he sometimes turns up
 early. π isn't just a good reason, it's a great reason. Switch it off and he's
 exactly as punctual as the slider says, which is somehow worse.
