@@ -26,13 +26,37 @@ brew trust ananthasharma/tap     # Homebrew asks before running third-party cask
 brew install --cask slicky
 ```
 
+`brew trust` isn't optional — Homebrew refuses to load casks from taps you
+haven't vouched for, and skipping it gets you `Error: Refusing to load cask`
+rather than anything helpful.
+
 Or grab the latest `Slicky.zip` from
 [Releases](https://github.com/ananthasharma/Slicky/releases), unzip, and drag him
 into `/Applications`. Releases are signed and notarised, so he opens like any
 other app — no scary dialog, no right-click ritual.
 
-He updates himself once installed, so `brew upgrade` deliberately leaves him
-alone; use `brew upgrade --cask --greedy slicky` if you'd rather Homebrew did it.
+<details>
+<summary>Living with the cask</summary>
+
+He updates himself, so Homebrew deliberately stays out of it:
+
+```bash
+brew upgrade --cask --greedy slicky   # only if you'd rather brew drove it
+```
+
+Removing him:
+
+```bash
+brew uninstall --cask slicky          # keeps your settings
+brew uninstall --zap --cask slicky    # takes them too
+```
+
+Quit him before uninstalling. macOS keeps a running app alive even after its
+bundle is deleted, so otherwise he'll carry on hopping around a robot-shaped
+hole until you log out, which is either a bug or the most on-brand thing he
+does.
+
+</details>
 
 Or build him yourself, which is more fun:
 
