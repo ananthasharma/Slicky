@@ -88,7 +88,7 @@ where the app went.
 | Right-click | Menu: apps, jump, say hi, selfie, settings, quit |
 | Drag him | Picks him up. He flails. It's fine, he likes it |
 | Drag an app onto him | See below, it's the best part |
-| Ignore him | He hops around your screen until you don't |
+| Ignore him | He hops — or strolls — around your screen until you don't |
 
 He has no Dock icon and no menu bar item, because *he* is the interface. Open
 the app again from Finder and Settings appears. Quit from his right-click menu,
@@ -130,13 +130,28 @@ double-click — and hops out of sheer enthusiasm.
 
 ## Dressing him
 
-<p align="center"><img src="docs/palettes.png" width="760" alt="Seven colour presets"></p>
+<p align="center"><img src="docs/palettes.png" width="760" alt="Ten colour presets"></p>
 
-Seven presets — Chrome, Midnight, Sunset, Mint, Grape, Cherry, Gold — or pick
-**Shell**, **Accent** and **Glow** yourself. One shell colour drives every panel,
-joint and highlight through derived ramps, so even a colour chosen at 2am looks
-deliberate. His body sheen flips from white to a soft glow on dark shells, which
-is the only reason Midnight doesn't look like a smudge.
+Ten presets — or pick **Shell**, **Accent** and **Glow** yourself. One shell
+colour drives every panel, joint and highlight through derived ramps, so even a
+colour chosen at 2am looks deliberate. His body sheen flips from white to a soft
+glow on dark shells, which is the only reason Midnight doesn't look like a
+smudge.
+
+Three of them are seeing summer off: **Sunflower** for the late sun, petals and
+seed-dark hands; **Linen** for the picnic blanket you haven't put away yet; and
+**Sky** for one more clear afternoon. He does not know summer is ending. Don't
+tell him.
+
+### Sizes
+
+<p align="center"><img src="docs/sizes.png" width="560" alt="Guppy, Trout, Mermaid and Whale"></p>
+
+The size slider goes wherever you drag it, but four points along it have names,
+and the name lights up when you land on one: **Guppy**, **Trout**, **Mermaid**,
+**Whale**. Click a name to snap straight to it. He starts life as a Trout.
+
+Yes, one of those is not a fish. Take it up with him.
 
 ## Selfies
 
@@ -196,14 +211,35 @@ A slim strip keeps Slicky in view with *Jump*, *Say hi* and *Selfie*, then four
 tabs so nothing has to scroll:
 
 - **Apps** — click bindings, and the extra apps in his right-click menu
-- **Look** — colours and size
+- **Look** — colours (including the end-of-summer three) and size, measured in fish
 - **Behaviour** — hop interval, hop distance, randomised waits, pointer
   tracking, floating above full-screen apps, typing dodge, launch at login
-- **About Slicky** — version, updates, the repo, and coffee
+- **About Slicky** — version and updates
 
-**Hop timing** deserves a note: the slider sets roughly how long he waits, and
-*Randomise the wait* adds a fresh **0.1–3.14 seconds** on top of every wait. Yes,
-π. No, there isn't a good reason. He simply refuses to be metronomic.
+Coffee and a *Star him on GitHub* button live in the footer, visible from every
+tab, because burying the tip jar three clicks deep felt like false modesty.
+
+**Hop timing** deserves a note. The slider sets roughly how long he waits, and
+*Randomise the wait* adds **±π seconds** to every gap — so he sometimes turns up
+early. π isn't just a good reason, it's a great reason. Switch it off and he's
+exactly as punctual as the slider says, which is somehow worse.
+
+**Hop distance** is measured in places from the Guide: **Traal**, **Damogran**,
+**Krikkit**, **Magrathea**. Like the size slider, drag it anywhere you like — the
+names just light up when you land on one. He has been to none of them.
+
+### Walking
+
+<p align="center"><img src="docs/walk.png" width="620" alt="One full walk cycle"></p>
+
+Roughly half the time he doesn't hop at all — he just walks there, legs
+alternating, leaning into it, antenna trailing behind, eyes on where he's going.
+His feet are tied to the distance actually covered, so he never skates.
+
+He only walks **sideways**. He cannot walk up or down, has not been told this is
+a limitation, and would be embarrassed to learn it. Stairs are a problem for a
+later version. Turn it off in Behaviour if you prefer a robot who commits fully
+to the thruster lifestyle.
 
 Everything lives in `UserDefaults` under `com.slicky.desktop`. To wipe him back
 to factory settings:

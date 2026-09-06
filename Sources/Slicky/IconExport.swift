@@ -33,6 +33,10 @@ enum IconExport {
             model.eating = chew
             model.presenting = true
         }
+        if let walk = ProcessInfo.processInfo.environment["SLICKY_WALK"].flatMap(Double.init) {
+            model.walkPhase = walk
+            model.facing = ProcessInfo.processInfo.environment["SLICKY_FACING"] == "-1" ? -1 : 1
+        }
         if ProcessInfo.processInfo.environment["SLICKY_BADGE"] != nil {
             let icon = NSWorkspace.shared.icon(forFile: "/Applications/Google Chrome.app")
             icon.size = NSSize(width: 44, height: 44)

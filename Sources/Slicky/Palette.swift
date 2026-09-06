@@ -102,5 +102,28 @@ struct Palette: Codable, Hashable {
         glow: RGB(1.00, 0.86, 0.42), outline: RGB(0.20, 0.14, 0.04),
         visor: RGB(0.13, 0.09, 0.03))
 
-    static let presets: [Palette] = [chrome, midnight, sunset, mint, grape, cherry, gold]
+    // Seeing summer off: late sun, picnic linen, and one last clear sky.
+    static let sunflower = Palette(
+        name: "Sunflower",
+        shell: RGB(0.98, 0.84, 0.32), accent: RGB(0.35, 0.23, 0.09),
+        glow: RGB(1.00, 0.82, 0.26), outline: RGB(0.19, 0.12, 0.04),
+        visor: RGB(0.13, 0.09, 0.03))
+
+    static let linen = Palette(
+        name: "Linen",
+        shell: RGB(0.94, 0.89, 0.79), accent: RGB(0.55, 0.49, 0.29),
+        glow: RGB(1.00, 0.86, 0.50), outline: RGB(0.22, 0.18, 0.11),
+        visor: RGB(0.16, 0.13, 0.08))
+
+    static let sky = Palette(
+        name: "Sky",
+        shell: RGB(0.85, 0.92, 0.99), accent: RGB(0.18, 0.54, 0.92),
+        glow: RGB(0.56, 0.86, 1.00), outline: RGB(0.06, 0.14, 0.26),
+        visor: RGB(0.05, 0.10, 0.19))
+
+    static let presets: [Palette] = [chrome, midnight, sunset, mint, grape, cherry, gold,
+                                     sunflower, linen, sky]
+
+    /// The tail of `presets` — the ones seeing summer off.
+    static let seasonalCount = 3
 }

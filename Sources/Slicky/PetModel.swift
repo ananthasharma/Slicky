@@ -27,6 +27,10 @@ final class PetModel: ObservableObject {
     @Published var eating: Double = 0
     /// Which side the page flies in from: +1 right, -1 left.
     @Published var eatSide: Double = 1
+    /// 0...1 repeating while he's walking; nil when he isn't.
+    @Published var walkPhase: Double?
+    /// Direction of travel: +1 right, -1 left.
+    @Published var facing: Double = 1
 
     var airborne: Bool {
         guard let phase else { return false }
@@ -37,7 +41,8 @@ final class PetModel: ObservableObject {
         PetSnapshot(phase: phase, held: held, excitement: excitement, waving: waving,
                     beckoning: beckoning, notify: updateAvailable,
                     pressed: pressed, anticipating: anticipating,
-                    presenting: presenting, eating: eating, eatSide: eatSide)
+                    presenting: presenting, eating: eating, eatSide: eatSide,
+                    walkPhase: walkPhase, facing: facing)
     }
 
     func celebrate(_ icon: NSImage?, rings: Int) {
@@ -66,6 +71,8 @@ struct PetSnapshot {
     var presenting = false
     var eating = 0.0
     var eatSide = 1.0
+    var walkPhase: Double?
+    var facing = 1.0
 }
 
 struct Pose {
@@ -85,6 +92,11 @@ struct Pose {
     /// Draw the  >_  face instead of the usual eyes.
     var notify = false
     var glowBoost: Double = 0
+    /// 0...1 walk cycle; the legs alternate half a cycle apart.
+    var legPhase: Double?
+    var facing = 1.0
+    /// Degrees of body tilt, into the direction of travel.
+    var lean: Double = 0
 
     static func make(time t: Double, _ state: PetSnapshot) -> Pose {
         let phase = state.phase
@@ -140,6 +152,17 @@ struct Pose {
                 pose.armAngle = 10 + 46 * recoil
                 pose.antennaBend = 16 * recoil
             }
+        }
+
+        if let walk = state.walkPhase {
+            let cycle = walk * 2 * .pi
+            pose.legPhase = walk
+            pose.facing = state.facing
+            pose.bob = sin(cycle * 2) * 1.5 - 0.8
+            pose.armAngle = 15 + sin(cycle) * 9
+            pose.lean = state.facing * 3.5
+            pose.antennaBend = -state.facing * 4 + sin(cycle) * 2.5
+            pose.eyeOpen = max(pose.eyeOpen, 0.85)
         }
 
         if state.anticipating {

@@ -70,13 +70,25 @@ struct SettingsView: View {
     }
 
     private var footer: some View {
-        HStack {
-            Text("Drag him anywhere · right-click him for the menu")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+        HStack(spacing: 10) {
+            Button {
+                SettingsControls.open(SettingsControls.coffee)
+            } label: {
+                Label("Buy me a coffee", systemImage: "cup.and.saucer.fill")
+            }
+            .help("I love coffee. Who doesn't.")
+
+            Button {
+                SettingsControls.open(SettingsControls.repo)
+            } label: {
+                Label("Star him on GitHub", systemImage: "star.fill")
+            }
+            .help("It costs you one click and makes his day")
+
             Spacer()
             Button("Quit Slicky") { NSApp.terminate(nil) }
         }
+        .controlSize(.small)
         .padding(.horizontal, 18)
         .padding(.vertical, 10)
     }
@@ -87,8 +99,9 @@ struct SettingsView: View {
                 .frame(width: 48, height: 74)
             VStack(alignment: .leading, spacing: 1) {
                 Text("Slicky").font(.headline)
-                Text("Version \(SettingsControls.version)")
-                    .font(.caption)
+                Text("Version \(SettingsControls.version) · drag him anywhere, "
+                     + "right-click for the menu")
+                    .font(.callout)
                     .foregroundStyle(.secondary)
             }
             Spacer()
@@ -172,6 +185,9 @@ struct LookTab: View {
                         }
                     }
                 }
+                Text("Sunflower, Linen and Sky are seeing summer off.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
             }
 
             SettingsCard("Custom colours") {
@@ -185,8 +201,12 @@ struct LookTab: View {
             }
 
             SettingsCard("Size") {
-                LabeledSlider(label: "Size", value: $controller.config.scale,
-                              range: 0.45...1.6, unit: "×", decimals: 2)
+                MarkedSlider(label: "Size", value: $controller.config.scale,
+                             range: 0.45...1.6, stops: MarkedSlider.fish,
+                             tolerance: 0.025) { String(format: "%.2f×", $0) }
+                Text("Sizes are fish. He is aware, and has made peace with it.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
             }
         }
     }
@@ -212,17 +232,28 @@ struct BehaviourTab: View {
                 Toggle("Hop around on its own", isOn: $controller.config.wander)
                 LabeledSlider(label: "Hop every", value: $controller.config.interval,
                               range: 5...180, unit: "s", prefix: "~")
-                Toggle("Randomise the wait", isOn: $controller.config.randomizeInterval)
+                Toggle("Randomise the wait, ±π", isOn: $controller.config.randomizeInterval)
                 Text(controller.config.randomizeInterval
-                     ? String(format: "About %.0fs, plus a random 0.1–3.14s each time.",
+                     ? String(format: "About %.0f seconds, give or take a π. "
+                              + "π isn't just a good reason, it's a great reason.",
                               controller.config.interval)
-                     : String(format: "Exactly %.0fs between hops.",
-                              controller.config.interval))
-                    .font(.caption)
+                     : String(format: "Exactly %.0f seconds, every time, like a "
+                              + "metronome with a face.", controller.config.interval))
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Divider()
+                Toggle("Sometimes walk instead of hopping", isOn: $controller.config.walks)
+                Text("He only walks sideways. Stairs are a problem for a later version.")
+                    .font(.callout)
                     .foregroundStyle(.secondary)
                 Divider()
-                LabeledSlider(label: "Hop distance", value: $controller.config.hopDistance,
-                              range: 80...900, unit: "pt")
+                MarkedSlider(label: "Hop distance", value: $controller.config.hopDistance,
+                             range: 80...900, stops: MarkedSlider.planets,
+                             tolerance: 12) { String(format: "%.0fpt", $0) }
+                Text("Named for places he will never visit. He's fine about it.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
             }
 
             SettingsCard("On screen") {
@@ -239,13 +270,13 @@ struct BehaviourTab: View {
                     if accessibilityTrusted {
                         Text("He hops aside when the text cursor ends up under him. "
                              + "Only the fact that you typed is used — never what.")
-                            .font(.caption)
+                            .font(.callout)
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
                     } else {
                         Text("Needs Accessibility access: the text cursor's position "
                              + "is only readable through it.")
-                            .font(.caption)
+                            .font(.callout)
                             .foregroundStyle(.orange)
                             .fixedSize(horizontal: false, vertical: true)
                         HStack {
@@ -262,10 +293,10 @@ struct BehaviourTab: View {
                 Toggle("Launch at login", isOn: $launchAtLogin)
                     .onChange(of: launchAtLogin) { _, enabled in setLaunchAtLogin(enabled) }
                 if let loginError {
-                    Text(loginError).font(.caption).foregroundStyle(.red)
+                    Text(loginError).font(.callout).foregroundStyle(.red)
                 } else {
                     Text("Move Slicky.app to /Applications before turning this on.")
-                        .font(.caption)
+                        .font(.callout)
                         .foregroundStyle(.secondary)
                 }
             }
@@ -292,9 +323,6 @@ struct AboutTab: View {
     @ObservedObject var controller: PetController
     @ObservedObject private var updater = Updater.shared
 
-    private static let repo = "https://github.com/ananthasharma/Slicky"
-    private static let coffee = "https://buymeacoffee.com/ananthasharma"
-
     private var statusText: String {
         switch updater.status {
         case .idle: return "Version \(updater.currentVersion)."
@@ -320,13 +348,11 @@ struct AboutTab: View {
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
-                Button {
-                    SettingsControls.open(Self.repo)
-                } label: {
-                    Label("See where Slicky came from on GitHub",
-                          systemImage: "chevron.left.forwardslash.chevron.right")
-                }
-                .buttonStyle(.link)
+                Text("Source, issues and the longer story are on GitHub — the "
+                     + "button below stars him, which he pretends not to care about.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
 
             SettingsCard("Updates") {
@@ -346,7 +372,7 @@ struct AboutTab: View {
                 if let release = updater.availableRelease {
                     if !release.notes.isEmpty {
                         Text(release.notes)
-                            .font(.caption)
+                            .font(.callout)
                             .foregroundStyle(.secondary)
                             .lineLimit(4)
                             .fixedSize(horizontal: false, vertical: true)
@@ -362,18 +388,6 @@ struct AboutTab: View {
                         Button("Not Now") { controller.updateInstalledOrDismissed() }
                     }
                 }
-            }
-
-            SettingsCard("Coffee") {
-                Text("I love coffee (who doesn't?) — feel free to buy me one!")
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-                Button {
-                    SettingsControls.open(Self.coffee)
-                } label: {
-                    Label("Buy me a coffee", systemImage: "cup.and.saucer.fill")
-                }
-                .buttonStyle(.borderedProminent)
             }
 
         }
@@ -443,6 +457,82 @@ struct AppRow: View {
     }
 }
 
+/// Free anywhere along the line, but a few points on it have names, and the
+/// name lights up when he lands on one.
+struct MarkedSlider: View {
+    struct Stop: Identifiable {
+        var id: String { name }
+        let name: String
+        let value: Double
+    }
+
+    let label: String
+    @Binding var value: Double
+    let range: ClosedRange<Double>
+    let stops: [Stop]
+    let tolerance: Double
+    let format: (Double) -> String
+
+    private var landedOn: Stop? {
+        stops.first { abs(value - $0.value) < tolerance }
+    }
+
+    private func fraction(_ stop: Stop) -> Double {
+        (stop.value - range.lowerBound) / (range.upperBound - range.lowerBound)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            HStack(spacing: 10) {
+                Text(label).frame(width: 88, alignment: .leading)
+                Slider(value: $value, in: range)
+                Text(landedOn?.name ?? format(value))
+                    .font(.callout)
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .frame(width: 80, alignment: .trailing)
+                    .foregroundStyle(landedOn == nil
+                                     ? AnyShapeStyle(.secondary)
+                                     : AnyShapeStyle(Color.accentColor))
+            }
+            GeometryReader { proxy in
+                // The thumb keeps its centre inside the track by about its own
+                // radius, so the names line up with where it can actually stop.
+                let inset = 9.0
+                let span = max(1, proxy.size.width - inset * 2)
+                ForEach(stops) { stop in
+                    let hit = landedOn?.name == stop.name
+                    Button(stop.name) { value = stop.value }
+                        .buttonStyle(.plain)
+                        .font(.caption.weight(hit ? .bold : .regular))
+                        .foregroundStyle(hit ? AnyShapeStyle(Color.accentColor)
+                                             : AnyShapeStyle(.secondary))
+                        .fixedSize()
+                        .position(x: inset + span * fraction(stop), y: 8)
+                }
+            }
+            .frame(height: 17)
+            .padding(.leading, 98)      // clear the label column
+            .padding(.trailing, 90)     // stop before the readout
+        }
+    }
+
+    static let fish: [Stop] = [
+        Stop(name: "Guppy", value: 0.55),
+        Stop(name: "Trout", value: 0.90),
+        Stop(name: "Mermaid", value: 1.20),
+        Stop(name: "Whale", value: 1.50),
+    ]
+
+    /// Places from the Guide, in rough order of how far you'd have to go.
+    static let planets: [Stop] = [
+        Stop(name: "Traal", value: 140),
+        Stop(name: "Damogran", value: 320),
+        Stop(name: "Krikkit", value: 550),
+        Stop(name: "Magrathea", value: 820),
+    ]
+}
+
 struct LabeledSlider: View {
     let label: String
     @Binding var value: Double
@@ -488,7 +578,7 @@ struct PaletteChip: View {
                                       lineWidth: selected ? 2.5 : 1)
                 )
                 Text(palette.name)
-                    .font(.caption2)
+                    .font(.caption)
                     .foregroundStyle(selected ? .primary : .secondary)
             }
         }
@@ -497,6 +587,9 @@ struct PaletteChip: View {
 }
 
 enum SettingsControls {
+    static let repo = "https://github.com/ananthasharma/Slicky"
+    static let coffee = "https://buymeacoffee.com/ananthasharma"
+
     static var version: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
     }

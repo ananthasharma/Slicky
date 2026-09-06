@@ -55,8 +55,10 @@ struct Config: Codable {
     var followCursor = true
     var palette: Palette = .chrome
     var dodgeTyping = false
-    /// Add an unpredictable 0.1–3.14s on top of the hop interval.
+    /// Add an unpredictable ±π seconds to the wait between moves.
     var randomizeInterval = true
+    /// Sometimes stroll to the next spot instead of hopping to it.
+    var walks = true
 
     static let storageKey = "SlickyConfig"
 
@@ -65,7 +67,7 @@ struct Config: Codable {
     private enum CodingKeys: String, CodingKey {
         case singleClick, doubleClick, menuApps, wander, interval, hopDistance
         case scale, aboveEverything, followCursor, palette, dodgeTyping
-        case randomizeInterval
+        case randomizeInterval, walks
     }
 
     /// Decoded field by field so a settings file written by an older build
@@ -87,6 +89,7 @@ struct Config: Codable {
         palette = value(.palette, .chrome)
         dodgeTyping = value(.dodgeTyping, false)
         randomizeInterval = value(.randomizeInterval, true)
+        walks = value(.walks, true)
     }
 
     static func load() -> Config {

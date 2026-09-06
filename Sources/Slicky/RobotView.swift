@@ -39,7 +39,7 @@ struct RobotView: View {
                 || model.excitement > 0.01 || model.waving > 0.01
                 || model.badgeLife > 0 || !model.pulses.isEmpty
                 || model.pressed || model.anticipating
-                || model.presenting || model.eating > 0
+                || model.presenting || model.eating > 0 || model.walkPhase != nil
             let interval = lively ? 1.0 / 60.0 : 1.0 / (Debug.idleFPS ?? 15)
             TimelineView(.animation(minimumInterval: interval, paused: model.paused)) { timeline in
                 canvas(at: timeline.date.timeIntervalSinceReferenceDate)
@@ -77,6 +77,7 @@ struct RobotView: View {
             // Squash and stretch pivot on the feet so the robot never sinks.
             body.translateBy(x: 80, y: L.groundY)
             body.scaleBy(x: pose.squashX, y: pose.squashY)
+            if pose.lean != 0 { body.rotate(by: .degrees(pose.lean)) }
             body.translateBy(x: -80, y: -L.groundY + pose.bob)
 
             drawThruster(&body, pose: pose, time: time)
@@ -229,16 +230,27 @@ struct RobotView: View {
     }
 
     private func drawLegs(_ ctx: inout GraphicsContext, pose: Pose) {
-        for x in [64.0, 96.0] {
-            let bottom = L.legBottom - 16 * pose.legTuck
-            let leg = Path(roundedRect: CGRect(x: x - 8, y: L.legTop, width: 16,
-                                               height: bottom - L.legTop), cornerRadius: 8)
+        for (index, x) in [64.0, 96.0].enumerated() {
+            // Walking: one leg lifts and reaches while the other stays planted,
+            // half a cycle apart.
+            var lift = 0.0
+            var reach = 0.0
+            if let phase = pose.legPhase {
+                let step = 2 * .pi * (phase + Double(index) * 0.5)
+                lift = max(0, sin(step)) * 7
+                reach = cos(step) * 5 * pose.facing
+            }
+
+            let bottom = L.legBottom - 16 * pose.legTuck - lift
+            let leg = Path(roundedRect: CGRect(x: x - 8 + reach, y: L.legTop, width: 16,
+                                               height: max(6, bottom - L.legTop)),
+                           cornerRadius: 8)
             paint(&ctx, leg, .linearGradient(palette.jointGradient,
                 startPoint: CGPoint(x: x - 8, y: 0), endPoint: CGPoint(x: x + 8, y: 0)),
                 lineWidth: 2.5)
 
             let footY = bottom - 2
-            let foot = Path(roundedRect: CGRect(x: x - 16, y: footY, width: 32, height: 14),
+            let foot = Path(roundedRect: CGRect(x: x - 16 + reach, y: footY, width: 32, height: 14),
                             cornerRadius: 7)
             paint(&ctx, foot, .linearGradient(
                 Gradient(colors: [palette.accent.color, palette.accent.color.opacity(0.72)]),
@@ -246,8 +258,6 @@ struct RobotView: View {
         }
     }
 
-    /// `pose.armAngle` is degrees of lift: 0 hangs straight down, 180 points
-    /// straight up. The sign flip mirrors it for the left side.
     private func drawArm(_ ctx: inout GraphicsContext, pose: Pose, side: Double) {
         let pivot = CGPoint(x: 80 + side * L.shoulderX, y: L.shoulderY)
         var lift = pose.armAngle

@@ -33,6 +33,13 @@ final class PetController: NSObject, ObservableObject, PetInteractionDelegate {
     private let crouchDuration = 0.16
     private let landDuration = 0.26
     private var hopping = false
+    private var walking = false
+    private var walkFrom = CGPoint.zero
+    private var walkTo = CGPoint.zero
+    private var walkElapsed = 0.0
+    private var walkDuration = 0.0
+    private let walkSpeed = 92.0          // points per second
+    private let strideLength = 46.0       // points per full leg cycle
     private var hopElapsed = 0.0
     private var hopDuration = 0.6
     private var hopFrom = CGPoint.zero
@@ -271,6 +278,7 @@ final class PetController: NSObject, ObservableObject, PetInteractionDelegate {
         }
 
         if hopping { advanceHop(dt) }
+        if walking { advanceWalk(dt) }
 
         if model.excitement > 0 { model.excitement = max(0, model.excitement - dt / 1.1) }
         if model.eating > 0 { model.eating = max(0, model.eating - dt / 0.95) }
@@ -286,8 +294,9 @@ final class PetController: NSObject, ObservableObject, PetInteractionDelegate {
         updateClickThrough()
         if frame % 2 == 0 { updateGaze() }
 
-        if !hopping, !dragging, !menuOpen, !notepadOpen, config.wander, now >= nextWander {
-            hop()
+        if !hopping, !walking, !dragging, !menuOpen, !notepadOpen,
+           config.wander, now >= nextWander {
+            wander()
         }
     }
 
@@ -296,6 +305,10 @@ final class PetController: NSObject, ObservableObject, PetInteractionDelegate {
         if hopping {
             let dx = hopTo.x - hopFrom.x
             setLook(CGPoint(x: max(-1, min(1, dx / 200)), y: -0.35))
+            return
+        }
+        if walking {
+            setLook(CGPoint(x: model.facing * 0.8, y: 0))
             return
         }
         guard config.followCursor else { setLook(.zero); return }
@@ -341,17 +354,86 @@ final class PetController: NSObject, ObservableObject, PetInteractionDelegate {
 
     /// The slider sets roughly how long to wait; the randomiser adds a little
     /// unpredictability on top so he never feels metronomic.
-    static let randomHopRange = 0.1...3.14
+    static let randomHopRange = -Double.pi...Double.pi
 
     private func scheduleNextWander() {
         let base = max(4, Debug.interval ?? config.interval)
         let extra = config.randomizeInterval
             ? Double.random(in: Self.randomHopRange) : 0
-        nextWander = Date().addingTimeInterval(base + extra)
+        nextWander = Date().addingTimeInterval(max(1.2, base + extra))
+    }
+
+    /// Sometimes he walks there instead of hopping. Walking is lateral only —
+    /// he has no idea how to take stairs.
+    private func wander() {
+        if config.walks, Bool.random(), startWalk() { return }
+        hop()
+    }
+
+    @discardableResult
+    private func startWalk() -> Bool {
+        guard let panel, !dragging, !hopping, !walking else { return false }
+        let bounds = allowedFrame(on: screenForPet())
+        let size = panel.frame.size
+        let origin = panel.frame.origin
+        let low = bounds.minX
+        let high = bounds.maxX - size.width
+        guard high - low > 80 else { return false }
+
+        for _ in 0..<6 {
+            let reach = Double.random(in: 90...max(140, config.hopDistance * 0.8))
+            let target = min(max(origin.x + (Bool.random() ? reach : -reach), low), high)
+            if abs(target - origin.x) > 60 {
+                beginWalk(toX: target)
+                return true
+            }
+        }
+        return false
+    }
+
+    private func beginWalk(toX x: Double) {
+        guard let panel else { return }
+        walkFrom = panel.frame.origin
+        walkTo = CGPoint(x: x, y: walkFrom.y)
+        walkDuration = max(0.7, abs(walkTo.x - walkFrom.x) / walkSpeed)
+        walkElapsed = 0
+        walking = true
+        model.facing = walkTo.x >= walkFrom.x ? 1 : -1
+        model.walkPhase = 0
+        setTickRate(activeTickRate)
+        Debug.log(String(format: "walk %.0f -> %.0f over %.1fs",
+                         walkFrom.x, walkTo.x, walkDuration))
+    }
+
+    private func advanceWalk(_ dt: Double) {
+        guard let panel else { return }
+        walkElapsed += dt
+        let t = min(1, walkElapsed / walkDuration)
+        let eased = t * t * (3 - 2 * t)          // no machine-like starts and stops
+        let x = walkFrom.x + (walkTo.x - walkFrom.x) * eased
+        panel.setFrameOrigin(NSPoint(x: x.rounded(), y: walkFrom.y.rounded()))
+
+        // Cadence follows distance actually covered, so his feet never skate.
+        let covered = abs(x - walkFrom.x)
+        model.walkPhase = (covered / strideLength).truncatingRemainder(dividingBy: 1)
+
+        if t >= 1 {
+            stopWalking()
+            savePosition()
+            scheduleNextWander()
+        }
+    }
+
+    private func stopWalking() {
+        guard walking else { return }
+        walking = false
+        model.walkPhase = nil
+        setTickRate(idleTickRate)
     }
 
     func hop(distance: Double? = nil) {
         guard let panel, !dragging else { return }
+        stopWalking()
         let size = panel.frame.size
         let screen = screenForPet()
         let bounds = allowedFrame(on: screen)
@@ -518,6 +600,7 @@ final class PetController: NSObject, ObservableObject, PetInteractionDelegate {
 
     func petDragBegan() {
         dragging = true
+        stopWalking()
         setTickRate(activeTickRate)
         model.held = true
         model.phase = nil
