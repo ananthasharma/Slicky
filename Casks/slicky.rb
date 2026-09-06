@@ -1,6 +1,6 @@
 cask "slicky" do
-  version "1.1"
-  sha256 "d7b3b0c3e828ed580aac26a3dd604db986530063464f2d86a4d2e8ab390fe0bb"
+  version "1.2"
+  sha256 "d314e76aaabf1acda95ccd7498e6ec5cf6bfa1bf55d038251c77d197dac369f3"
 
   url "https://github.com/ananthasharma/Slicky/releases/download/v#{version}/Slicky.zip",
       verified: "github.com/ananthasharma/Slicky/"
