@@ -7,6 +7,17 @@
   and opens your apps because you asked nicely.</em>
 </p>
 
+<p align="center">
+  <a href="https://github.com/ananthasharma/Slicky/actions/workflows/build.yml"><img src="https://github.com/ananthasharma/Slicky/actions/workflows/build.yml/badge.svg" alt="Build"></a>
+  <img src="https://img.shields.io/badge/macOS-14%2B-111111" alt="macOS 14+">
+  <img src="https://img.shields.io/badge/universal-Apple%20Silicon%20%2B%20Intel-111111" alt="Universal">
+  <img src="https://img.shields.io/badge/licence-MIT-111111" alt="MIT licence">
+</p>
+
+<p align="center"><b>Available on Homebrew</b></p>
+
+<p align="center"><code>brew tap ananthasharma/tap && brew trust ananthasharma/tap && brew install --cask slicky</code></p>
+
 ---
 
 Your Mac has a Dock. The Dock is fine. The Dock has never once been excited to
