@@ -20,10 +20,19 @@ component. He does not want your email address.
 
 ## Get him
 
-Grab the latest `Slicky.zip` from
+```bash
+brew tap ananthasharma/tap
+brew trust ananthasharma/tap     # Homebrew asks before running third-party casks
+brew install --cask slicky
+```
+
+Or grab the latest `Slicky.zip` from
 [Releases](https://github.com/ananthasharma/Slicky/releases), unzip, and drag him
 into `/Applications`. Releases are signed and notarised, so he opens like any
 other app — no scary dialog, no right-click ritual.
+
+He updates himself once installed, so `brew upgrade` deliberately leaves him
+alone; use `brew upgrade --cask --greedy slicky` if you'd rather Homebrew did it.
 
 Or build him yourself, which is more fun:
 
@@ -308,6 +317,7 @@ Sources/Slicky/
   SettingsView.swift   the tabbed settings window
   Config.swift         persisted configuration
   Debug.swift          env-var tracing
+Casks/slicky.rb        the Homebrew cask, mirrored into the tap on release
 ```
 
 Idle drawing runs at 15fps and the frame loop stops completely when he's hidden

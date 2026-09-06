@@ -181,6 +181,17 @@ if [[ "$RELEASE" == yes ]]; then
     rm -f "$DIST/$APP_NAME.zip"
     ditto -c -k --keepParent "$APP" "$DIST/$APP_NAME.zip"
 
+    echo "▸ Updating the Homebrew cask…"
+    SHA="$(shasum -a 256 "$DIST/$APP_NAME.zip" | cut -d' ' -f1)"
+    CASK="$ROOT/Casks/slicky.rb"
+    if [[ -f "$CASK" ]]; then
+        /usr/bin/sed -i '' -e "s/^  version \".*\"$/  version \"$VERSION\"/" \
+                           -e "s/^  sha256 \".*\"$/  sha256 \"$SHA\"/" "$CASK"
+        echo "  $CASK now points at $VERSION"
+        echo "  remember to commit it, and mirror it to the tap:"
+        echo "    cp Casks/slicky.rb ../homebrew-tap/Casks/ && (cd ../homebrew-tap && git commit -am 'Slicky $VERSION' && git push)"
+    fi
+
     echo "▸ Gatekeeper says:"
     spctl -a -vvv "$APP" 2>&1 | sed 's/^/  /' || true
     echo "✓ $DIST/$APP_NAME.zip is ready to attach to a release"
